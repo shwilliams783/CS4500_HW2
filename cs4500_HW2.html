@@ -244,7 +244,7 @@ document.getElementById("maxTouches").innerHTML = "The cell most frequently visi
 document.getElementById("minTouches").innerHTML = "The cell least frequently visited was visited " + 0 + " times.";
 
 // Display the average number of times a given cell in the grid was visited.
-average = count/100;
+average = count/(numRows*numCols);
 document.getElementById("averageTouches").innerHTML = "Each cell was visited an average of " + average + " times."; 
 }
 
