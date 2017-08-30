@@ -21,20 +21,61 @@
 
 <h1>Grid Game Simulation</h1>
 
+<p>Select the number of rows:</p>
+<select>
+	<option value="5rows">5</option>
+    <option value="6rows">6</option>
+    <option value="7rows">7</option>
+    <option value="8rows">8</option>
+    <option value="9rows">9</option>
+    <option value="10rows">10</option>
+    <option value="11rows">11</option>
+    <option value="12rows">12</option>
+    <option value="13rows">13</option>
+    <option value="14rows">14</option>
+    <option value="15rows">15</option>
+    <option value="16rows">16</option>
+    <option value="17rows">17</option>
+    <option value="18rows">18</option>
+    <option value="19rows">19</option>
+    <option value="20rows">20</option>
+</select>
+
+<p>Select the number of columns:</p>
+<select>
+	<option value="5cols">5</option>
+    <option value="6cols">6</option>
+    <option value="7cols">7</option>
+    <option value="8cols">8</option>
+    <option value="9cols">9</option>
+    <option value="10cols">10</option>
+    <option value="11cols">11</option>
+    <option value="12cols">12</option>
+    <option value="13cols">13</option>
+    <option value="14cols">14</option>
+    <option value="15cols">15</option>
+    <option value="16cols">16</option>
+    <option value="17cols">17</option>
+    <option value="18cols">18</option>
+    <option value="19cols">19</option>
+    <option value="20cols">20</option>
+</select>
+</br>
+</br>
 <canvas id="gameBoard" width="0" height="0"></canvas>
-<p id="moveCount">moveCount</p>
-<p id="markerPosition">markerPosition</p>
-<p id="gameResult">gameResult</p>
-<p id="maxTouches">maxTouches</p>
-<p id="minTouches">minTouches</p>
-<p id="averageTouches">averageTouches</p>
+<p id="moveCount"></p>
+<p id="markerPosition"></p>
+<p id="gameResult"></p>
+<p id="maxTouches"></p>
+<p id="minTouches"></p>
+<p id="averageTouches"></p>
 
 <script>
-// Variables
 
+// Variables
 // Grid size variables for rows and columns
-var numRows = 10;
-var numCols = 10;
+var numRows = 5;
+var numCols = 5;
 
 // Current coordinates of the marker; one of these values will
 // change by an integer from [-2,2] each cycle (most commonly 0).
@@ -53,18 +94,27 @@ var count = 1;
 // If proper visualization is needed later, the array setup and directonal
 // movement may need to be altered.
 var grid =	[
-		[1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-		];
-            
+			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            ]
 // The current maximum number of times any given cell in the grid has been touched.
 var max = 1;
 
