@@ -22,7 +22,7 @@
 <h1>Grid Game Simulation</h1>
 
 <p>Select the number of rows:</p>
-<select>
+<select id="rowSelect">
 	<option value="5rows">5</option>
     <option value="6rows">6</option>
     <option value="7rows">7</option>
@@ -42,7 +42,7 @@
 </select>
 
 <p>Select the number of columns:</p>
-<select>
+<select id="colSelect">
 	<option value="5cols">5</option>
     <option value="6cols">6</option>
     <option value="7cols">7</option>
@@ -60,6 +60,11 @@
     <option value="19cols">19</option>
     <option value="20cols">20</option>
 </select>
+
+</br>
+</br>
+<button onClick="playGame()">Play the Game!</button>
+
 </br>
 </br>
 <canvas id="gameBoard" width="0" height="0"></canvas>
@@ -72,10 +77,23 @@
 
 <script>
 
+// Functions
+
+// playGame()
+// Purpose: To simulate a starange game with a graphical display and user input
+// Inputs: rowSelect, colSelect
+// Outputs: The simulated strange game as descibed in HW1
+function playGame(){
+
 // Variables
+
+// Row and column select tags from User
+var rowSelect = document.getElementById("rowSelect");
+var colSelect = document.getElementById("colSelect");
+
 // Grid size variables for rows and columns
-var numRows = 5;
-var numCols = 5;
+var numRows = rowSelect.options[rowSelect.selectedIndex].text;
+var numCols = colSelect.options[colSelect.selectedIndex].text;
 
 // Current coordinates of the marker; one of these values will
 // change by an integer from [-2,2] each cycle (most commonly 0).
@@ -228,8 +246,9 @@ document.getElementById("minTouches").innerHTML = "The cell least frequently vis
 // Display the average number of times a given cell in the grid was visited.
 average = count/100;
 document.getElementById("averageTouches").innerHTML = "Each cell was visited an average of " + average + " times."; 
+}
 
-// Functions
+
 
 // drawGrid()
 // Purpose: to draw the game board as a grid of squares
