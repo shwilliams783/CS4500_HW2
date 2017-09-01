@@ -85,13 +85,15 @@ var colSelect = document.getElementById("colSelect");
 var numRows = rowSelect.options[rowSelect.selectedIndex].text;
 var numCols = colSelect.options[colSelect.selectedIndex].text;
 
+var runSpeed = 500;
+
 // Current coordinates of the marker; one of these values will
 // change by an integer from [-2,2] each cycle (most commonly 0).
 var posX = 0;
 var posY = 0;
 
 // Total number of moves taken; will increment by +1 each cycle.
-var count = 1;
+var count = 0;
 
 // Starting grid touch counts; one cell will increment by +1 each cycle.
 // NOTE: The simulation describes the starting marker as the bottom left corner
@@ -102,7 +104,7 @@ var count = 1;
 // If proper visualization is needed later, the array setup and directonal
 // movement may need to be altered.
 var grid =	[
-			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -125,7 +127,7 @@ var grid =	[
             ]
 			
 // The current maximum number of times any given cell in the grid has been touched.
-var max = 1;
+var max = 0;
 
 // The current minimum number of times any given cell in the grid has been touched.
 var min = 1000000;
@@ -139,6 +141,12 @@ var direction = 0;
 
 // Avariable for movement distances.
 var distance = 0;
+
+// Prepare the canvas
+var gameBoard = document.getElementById("gameBoard");
+
+// Draw the border surrounding the board	
+var boardMaker = gameBoard.getContext('2d');
 
 //End Variables
 
@@ -175,21 +183,18 @@ checkArray();
 // Outputs: a NxN grid drawn on canvas
 function drawGrid(rows, cols){
 
-	// Prepare the canvas
-    var gameBoard = document.getElementById("gameBoard");
     gameBoard.width = cols*21+1;
     gameBoard.height = rows*21+1;
     
-	// Draw the border surrounding the board	
-	var boardMaker = gameBoard.getContext('2d');
+	
 	boardMaker.strokeStyle = "maroon";
 	boardMaker.fillStyle = "maroon";
 	boardMaker.fillRect(0, 0, 21*cols+1, 21*rows+1);
 	boardMaker.stroke();
     
 	// Draw each grid square (alternating between colors)
-	for (var x = 0; x < cols; x++) {
-		for(var y = 0; y < rows; y++){
+	for (x = 0; x < cols; x++) {
+		for(y = 0; y < rows; y++){
         
 			// Even numbered tiles
 			if((x+y)%2 == 0){
@@ -204,6 +209,16 @@ function drawGrid(rows, cols){
 		}
 	}
 }// End drawGrid()
+
+// drawMarker()
+// Purpose: This function updates the canvas with the current status of the game marker, represented by a red square.
+// Inputs: none
+// Outputs: none
+function drawMarker(){
+    // Place red marker on new tile
+    boardMaker.fillStyle = "red";
+	boardMaker.fillRect(1+posX*21, 1+posY*21, 20, 20);
+}// End drawMarker()
 
 // moveMarker()
 // Purpose: Simulates random movement of the red marker on the grid.
@@ -253,9 +268,11 @@ function moveMarker(){
 	
 	// Increment the touch count at the marker's current position on the grid.
 	grid[posX][posY]++;
+    // Increment the counter
     count++;
+    // Update the board and information
     updateBoard();
-}// End moveMarker();
+}// End moveMarker()
 
 // updateBoard()
 // Purpose: graphically updates the UI in real time
@@ -295,9 +312,13 @@ function updateBoard(){
 	average = count/(numRows*numCols);
 	document.getElementById("averageTouches").innerHTML = "Each cell was visited an average of " + average + "times."; 
 	
+	//Update the game board graphics
+    drawGrid(numRows, numCols);
+	drawMarker();
+	
 	// Check for win/lose condition, call moveMarker() to continue game if win/lose condition not met.
 	if(count <= 1000000 && (posX != numCols-1 || posY != numRows-1)){
-    	setTimeout(function(){ moveMarker(); },(100));
+    	setTimeout(function(){ moveMarker(); },(runSpeed*count/(count+1)));
     }
 }// End updateBoard()
 
@@ -321,7 +342,7 @@ posX = 0;
 posY = 0;
 
 // Total number of moves taken; will increment by +1 each cycle.
-count = 1;
+count = 0;
 
 // Starting grid touch counts; one cell will increment by +1 each cycle.
 // NOTE: The simulation describes the starting marker as the bottom left corner
@@ -332,7 +353,7 @@ count = 1;
 // If proper visualization is needed later, the array setup and directonal
 // movement may need to be altered.
 grid =		[
-			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -354,7 +375,7 @@ grid =		[
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
             ]
 // The current maximum number of times any given cell in the grid has been touched.
-max = 1;
+max = 0;
 
 // The current minimum number of times any given cell in the grid has been touched.
 min = 1000000;
