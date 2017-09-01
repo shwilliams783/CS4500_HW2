@@ -76,17 +76,7 @@
 <p id="averageTouches"></p>
 
 <script>
-
-// Functions
-
-// playGame()
-// Purpose: To simulate a starange game with a graphical display and user input
-// Inputs: rowSelect, colSelect
-// Outputs: The simulated strange game as descibed in HW1
-function playGame(){
-
 // Variables
-
 // Row and column select tags from User
 var rowSelect = document.getElementById("rowSelect");
 var colSelect = document.getElementById("colSelect");
@@ -133,32 +123,96 @@ var grid =	[
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
             ]
+			
 // The current maximum number of times any given cell in the grid has been touched.
 var max = 1;
 
 // The current minimum number of times any given cell in the grid has been touched.
-var min = 0;
+var min = 1000000;
 
 // The average number of times any given cell in the grid has been touched;
 // to be calculated after a non-zero number of cycles have been completed.
-var average;
+var average = 0;
 
 // A variable for movement directions.
-var direction;
+var direction = 0;
 
 // Avariable for movement distances.
-var distance;
+var distance = 0;
+
+//End Variables
+
+
+// Functions
+// playGame()
+// Purpose: To simulate a starange game with a graphical display and user input
+// Inputs: rowSelect, colSelect
+// Outputs: The simulated strange game as descibed in HW1
+function playGame(){
+
+// Reset the game
+resetGame();
 
 // Create the board
 drawGrid(numRows, numCols);
 
-
 // Program execution loop; This loop should loop a maximum of 1,000,000 times
 // before terminating. Either the marker will reach (9,9), or the count will reach
 // 1000001.
-do
-{
-	// STEP 1: Randomly assign 0, 1, 2, or 3 to direction; these will correspond to
+moveMarker();
+
+calcMax();
+calcMin();
+
+// Display the number of moves taken during this game.
+updateBoard();
+checkArray();
+}// End playGame()
+
+// drawGrid()
+// Purpose: to draw the game board as a grid of squares
+// Inputs: numRows, numCols
+// Outputs: a NxN grid drawn on canvas
+function drawGrid(rows, cols){
+
+	// Prepare the canvas
+    var gameBoard = document.getElementById("gameBoard");
+    gameBoard.width = cols*21+1;
+    gameBoard.height = rows*21+1;
+    
+	// Draw the border surrounding the board	
+	var boardMaker = gameBoard.getContext('2d');
+	boardMaker.strokeStyle = "maroon";
+	boardMaker.fillStyle = "maroon";
+	boardMaker.fillRect(0, 0, 21*cols+1, 21*rows+1);
+	boardMaker.stroke();
+    
+	// Draw each grid square (alternating between colors)
+	for (var x = 0; x < cols; x++) {
+		for(var y = 0; y < rows; y++){
+        
+			// Even numbered tiles
+			if((x+y)%2 == 0){
+			boardMaker.fillStyle = "darkblue";
+			}
+            
+			// Odd numbered tiles
+			else{
+				boardMaker.fillStyle = "black";
+			}
+			boardMaker.fillRect(1+x*21, 1+y*21, 20, 20);
+		}
+	}
+}// End drawGrid()
+
+// moveMarker()
+// Purpose: Simulates random movement of the red marker on the grid.
+// Calls updateBoard() to update the game state in perceivable time.
+// Inputs: none
+// Outputs: none
+function moveMarker(){
+	
+    // STEP 1: Randomly assign 0, 1, 2, or 3 to direction; these will correspond to
 	// up, down, right, or left movement.
 	direction = Math.floor((Math.random()*4));
 	
@@ -199,90 +253,174 @@ do
 	
 	// Increment the touch count at the marker's current position on the grid.
 	grid[posX][posY]++;
-	count++;
-}while(count <= 1000000 && (posX != numCols-1 || posY != numRows-1));
+    count++;
+    updateBoard();
+}// End moveMarker();
 
-// Calculate the max and min values of the grid cells.
-for(i = 0; i < numCols; i++)
-{
-	for(j = 0; j < numRows; j++)
+// updateBoard()
+// Purpose: graphically updates the UI in real time
+// Inputs: none
+// Outputs: none
+function updateBoard(){
+
+	// Display the number of moves taken during this game.
+	document.getElementById("moveCount").innerHTML = "Number of moves taken: " + count;
+
+	// Display the coordinates of the marker at the end of the game.
+	document.getElementById("markerPosition").innerHTML = "Marker position: (" + posX + ',' + posY + ')';
+
+	// Display "You win!" or "No steps left!" depending on the end state of the game.
+	if(count <= 1000000 && posX == numCols-1 && posY == numRows-1)
 	{
-		// Check for touch counts higher than the current max.
-		if(grid[i][j] > max)
-		{
-			max = grid[i][j];
-		}
-		
-		// Check for touch counts lower than the current min.
-		if(grid[i][j] < min)
-		{
-			min = grid[i][j];
-		}
+		document.getElementById("gameResult").innerHTML = "You win!";
 	}
-}
+	else if(count > 1000000)
+	{
+		document.getElementById("gameResult").innerHTML = "No steps left!";
+	}
+	else{
+		document.getElementById("gameResult").innerHTML = "Game in progress...";
+	}
+    
+    // Update the Max values
+    calcMax();
 
-// Display the number of moves taken during this game.
-document.getElementById("moveCount").innerHTML = "Number of moves taken: " + count;
+	// Display the maximum number of times a given cell in the grid was visited.
+	document.getElementById("maxTouches").innerHTML = "The cell most frequently visited was visited " + max + " times.";
 
-// Display the coordinates of the marker at the end of the game.
-document.getElementById("markerPosition").innerHTML = "Final marker position: (" + posX + ',' + posY + ')';
+	// Display the minimum number of times a given cell in the grid was visited.
+	document.getElementById("minTouches").innerHTML = "The cell least frequently visited was visited " + min + " times.";
 
-// Display "You win!" or "No steps left!" depending on the end state of the game.
-if(count <= 1000000 && posX == numCols-1 && posY == numRows-1)
-{
-	document.getElementById("gameResult").innerHTML = "You win!";
-}
-else
-{
-	document.getElementById("gameResult").innerHTML = "No steps left!";
-}
-
-// Display the maximum number of times a given cell in the grid was visited.
-document.getElementById("maxTouches").innerHTML = "The cell most frequently visited was visited " + max + " times.";
-
-// Display the minimum number of times a given cell in the grid was visited.
-document.getElementById("minTouches").innerHTML = "The cell least frequently visited was visited " + 0 + " times.";
-
-// Display the average number of times a given cell in the grid was visited.
-average = count/(numRows*numCols);
-document.getElementById("averageTouches").innerHTML = "Each cell was visited an average of " + average + " times."; 
-}
-
-
-
-// drawGrid()
-// Purpose: to draw the game board as a grid of squares
-// Inputs: numRows, numCols
-// Outputs: a NxN grid drawn on canvas
-function drawGrid(rows, cols){
-
-	// Prepare the canvas
-    var gameBoard = document.getElementById("gameBoard");
-    gameBoard.width = cols*21+1;
-    gameBoard.height = rows*21+1;
-	// Draw the border surrounding the board
+	// Display the average number of times a given cell in the grid was visited.
+	average = count/(numRows*numCols);
+	document.getElementById("averageTouches").innerHTML = "Each cell was visited an average of " + average + "times."; 
 	
-	var boardMaker = gameBoard.getContext('2d');
-	boardMaker.strokeStyle = "maroon";
-	boardMaker.fillStyle = "maroon";
-	boardMaker.fillRect(0, 0, 21*cols+1, 21*rows+1);
-	boardMaker.stroke();
+	// Check for win/lose condition, call moveMarker() to continue game if win/lose condition not met.
+	if(count <= 1000000 && (posX != numCols-1 || posY != numRows-1)){
+    	setTimeout(function(){ moveMarker(); },(100));
+    }
+}// End updateBoard()
 
-	// Draw each grid square (alternating between colors)
-	for (var x = 0; x < cols; x++) {
-		for(var y = 0; y < rows; y++){
-			// Even numbered tiles
-			if((x+y)%2 == 0){
-			boardMaker.fillStyle = "darkblue";
+// resetGame()
+// Purpose: This function resets the starting variables to their default values
+// Inputs: none
+// Outputs: none
+function resetGame(){
+// Variables
+// Row and column select tags from User
+rowSelect = document.getElementById("rowSelect");
+colSelect = document.getElementById("colSelect");
+
+// Grid size variables for rows and columns
+numRows = rowSelect.options[rowSelect.selectedIndex].text;
+numCols = colSelect.options[colSelect.selectedIndex].text;
+
+// Current coordinates of the marker; one of these values will
+// change by an integer from [-2,2] each cycle (most commonly 0).
+posX = 0;
+posY = 0;
+
+// Total number of moves taken; will increment by +1 each cycle.
+count = 1;
+
+// Starting grid touch counts; one cell will increment by +1 each cycle.
+// NOTE: The simulation describes the starting marker as the bottom left corner
+// of the grid, however for simplicity, I will define that cell as grid[0][0],
+// currently the top left of the 2-D array below. This definition will cause
+// position movements to the right or up to be the positive direction, and 
+// position movements to the left or right to be the negative direction.
+// If proper visualization is needed later, the array setup and directonal
+// movement may need to be altered.
+grid =		[
+			[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            ]
+// The current maximum number of times any given cell in the grid has been touched.
+max = 1;
+
+// The current minimum number of times any given cell in the grid has been touched.
+min = 1000000;
+
+// The average number of times any given cell in the grid has been touched;
+// to be calculated after a non-zero number of cycles have been completed.
+average = 0;
+
+// A variable for movement directions.
+direction = 0;
+
+// Avariable for movement distances.
+distance = 0;
+}// End resetGame()
+
+// calcMax()
+// Purpose: This function calculates the maximum number of times any given tile was touched.
+// Inputs: none
+// Outputs: none
+function calcMax(){
+	for(i = 0; i < numCols; i++){
+		for(j = 0; j < numRows; j++){
+			
+	
+			// Check for touch counts higher than the current max.
+			if(grid[i][j] > max)
+			{
+				max = grid[i][j];
+				
 			}
-			// Odd numbered tiles
-			else{
-				boardMaker.fillStyle = "black";
-			}
-			boardMaker.fillRect(1+x*21, 1+y*21, 20, 20);
 		}
 	}
-}
+}// End calcMax()
+
+// calcMin()
+// Purpose: This function calculates the minimum number of times any given tile was touched.
+// Inputs: none
+// Outputs: none
+function calcMin(){
+	for(i = 0; i < numCols; i++){
+		for(j = 0; j < numRows; j++){
+			
+
+			// Check for touch counts lower than the current min.
+			if(grid[i][j] < min)
+			{
+				min = grid[i][j];
+				console.log("New min = " + min);
+			}
+		}
+	}
+}// End calcMin()
+
+// checkArray()
+// Purpose: This function displays the contents of the game array to the console
+// Inputs: none
+// Outputs: none
+function checkArray(){
+	for(i = 0; i < numCols; i++){
+		
+			console.log(grid[i]);
+		
+	}
+}// End checkArray()
+
+
 </script>
 
 </body>
