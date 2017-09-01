@@ -85,24 +85,17 @@ var colSelect = document.getElementById("colSelect");
 var numRows = rowSelect.options[rowSelect.selectedIndex].text;
 var numCols = colSelect.options[colSelect.selectedIndex].text;
 
-var runSpeed = 500;
+var runSpeed = 500/((numRows*numCols)/10);
 
 // Current coordinates of the marker; one of these values will
 // change by an integer from [-2,2] each cycle (most commonly 0).
 var posX = 0;
-var posY = 0;
+var posY = numCols-1;
 
 // Total number of moves taken; will increment by +1 each cycle.
 var count = 0;
 
 // Starting grid touch counts; one cell will increment by +1 each cycle.
-// NOTE: The simulation describes the starting marker as the bottom left corner
-// of the grid, however for simplicity, I will define that cell as grid[0][0],
-// currently the top left of the 2-D array below. This definition will cause
-// position movements to the right or up to be the positive direction, and 
-// position movements to the left or right to be the negative direction.
-// If proper visualization is needed later, the array setup and directonal
-// movement may need to be altered.
 var grid =	[
 			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -287,7 +280,7 @@ function updateBoard(){
 	document.getElementById("markerPosition").innerHTML = "Marker position: (" + posX + ',' + posY + ')';
 
 	// Display "You win!" or "No steps left!" depending on the end state of the game.
-	if(count <= 1000000 && posX == numCols-1 && posY == numRows-1)
+	if(count <= 1000000 && posX == numCols-1 && posY == 0)
 	{
 		document.getElementById("gameResult").innerHTML = "You win!";
 	}
@@ -317,7 +310,7 @@ function updateBoard(){
 	drawMarker();
 	
 	// Check for win/lose condition, call moveMarker() to continue game if win/lose condition not met.
-	if(count <= 1000000 && (posX != numCols-1 || posY != numRows-1)){
+	if(count <= 1000000 && (posX != numCols-1 || posY != 0)){
     	setTimeout(function(){ moveMarker(); },(runSpeed*count/(count+1)));
     }
 }// End updateBoard()
@@ -339,19 +332,12 @@ numCols = colSelect.options[colSelect.selectedIndex].text;
 // Current coordinates of the marker; one of these values will
 // change by an integer from [-2,2] each cycle (most commonly 0).
 posX = 0;
-posY = 0;
+posY = numCols-1;
 
 // Total number of moves taken; will increment by +1 each cycle.
 count = 0;
 
 // Starting grid touch counts; one cell will increment by +1 each cycle.
-// NOTE: The simulation describes the starting marker as the bottom left corner
-// of the grid, however for simplicity, I will define that cell as grid[0][0],
-// currently the top left of the 2-D array below. This definition will cause
-// position movements to the right or up to be the positive direction, and 
-// position movements to the left or right to be the negative direction.
-// If proper visualization is needed later, the array setup and directonal
-// movement may need to be altered.
 grid =		[
 			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
